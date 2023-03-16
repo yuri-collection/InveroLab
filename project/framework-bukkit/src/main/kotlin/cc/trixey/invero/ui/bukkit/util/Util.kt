@@ -42,3 +42,11 @@ fun <T> T.proceed(condition: (T) -> Boolean, block: () -> Unit): T {
 fun middle(pos1: Pair<Int, Int>, pos2: Pair<Int, Int>): Pair<Int, Int> {
     return (pos1.first + pos2.first) / 2 to (pos1.second + pos2.second) / 2
 }
+
+fun Double.format(): String {
+    return String.format("%.2f", this)
+}
+
+fun Float.format(): String {
+    return String.format("%.2f", this)
+}

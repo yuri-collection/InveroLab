@@ -7,7 +7,6 @@ import cc.trixey.invero.ui.common.event.ClickType
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
-import taboolib.common.platform.function.submitAsync
 
 /**
  * Invero
@@ -20,7 +19,7 @@ import taboolib.common.platform.function.submitAsync
 @Serializable
 class IconHandler(@JsonNames("def") val default: Action?, val typed: Map<ClickType, Action> = mapOf()) {
 
-    fun run(context: Context, clickType: ClickType) = submitAsync {
+    fun run(context: Context, clickType: ClickType) {
         // 临时暂停动态标题
         context.session?.pauseAnimatedTitle(5L)
         alert {

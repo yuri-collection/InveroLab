@@ -1,8 +1,7 @@
 package cc.trixey.invero.core.script
 
-import cc.trixey.invero.core.script.session
-import taboolib.common5.cdouble
 import cc.trixey.invero.core.script.loader.InveroKetherParser
+import taboolib.common5.cdouble
 import taboolib.module.kether.combinationParser
 
 /**
@@ -38,12 +37,14 @@ object ActionContext {
                         variables().remove(key)
                         completedFuture(session()?.removeVariable(key))
                     }
+
                     "set" -> {
                         (value ?: error("No valid value")).thenApply {
                             variables().set(key, it)
                             session()?.setVariable(key, it)
                         }
                     }
+
                     "inc", "increase", "+=" -> {
                         (value ?: error("No valid value")).thenApply {
                             session()?.apply {

@@ -2,11 +2,12 @@ import java.text.SimpleDateFormat
 
 const val rootName = "Invero"
 const val rootGroup = "cc.trixey.invero"
-const val rootVersion = "1.0.3"
+const val rootVersion = "1.0.5"
 
 const val kotlinVersion = "1.8.10"
 const val shadowJarVersion = "8.1.0"
 const val taboolibPluginVersion = "1.56"
+
 val taboolibVersion = taboolibLatestVersion.also { println("Using taboolib-version = $it") }
 const val repoTabooProject = "http://ptms.ink:8081/repository/releases"
 

@@ -4,7 +4,7 @@
         value = "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.5.0-RC",
         relocate = ["!kotlin.", "!kotlin1810.", "!kotlinx.", "!kotlinx150."],
         transitive = false
-    ),RuntimeDependency(
+    ), RuntimeDependency(
         value = "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.5.0-RC",
         relocate = ["!kotlin.", "!kotlin1810.", "!kotlinx.", "!kotlinx150."],
         transitive = false

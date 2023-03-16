@@ -4,8 +4,9 @@ import cc.trixey.invero.common.adventure.parseMiniMessage
 import cc.trixey.invero.common.adventure.parseMiniMessageAndSend
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.adaptPlayer
-import taboolib.module.chat.colored
+import taboolib.module.chat.HexColor
 import taboolib.module.chat.component
+import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.compat.replacePlaceholder
 
 /**
@@ -61,3 +62,16 @@ fun String.sendFormattedTabooComponent(player: Player, variables: Map<String, An
         .component()
         .build()
         .sendTo(adaptPlayer(player))
+
+fun String.colored() =
+    HexColor
+        .translate(this)
+        .let {
+            if (patchDragonCore) {
+                it.replace("&#", "§#")
+            } else {
+                it
+            }
+        }
+
+private val patchDragonCore: Boolean = MinecraftVersion.majorLegacy in 11200 until 11300

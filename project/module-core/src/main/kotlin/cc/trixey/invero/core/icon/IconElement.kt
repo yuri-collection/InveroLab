@@ -5,6 +5,7 @@ import cc.trixey.invero.core.Context
 import cc.trixey.invero.core.Session
 import cc.trixey.invero.core.animation.Cyclic
 import cc.trixey.invero.core.item.Frame
+import cc.trixey.invero.core.item.renderFor
 import cc.trixey.invero.core.util.session
 import cc.trixey.invero.ui.bukkit.api.dsl.set
 import cc.trixey.invero.ui.bukkit.element.item.SimpleItem
@@ -34,7 +35,7 @@ open class IconElement(
 
     private var frame: Frame? = null
         set(value) {
-            value?.render(agent, this)
+            value?.renderFor(agent.scale, this)
             field = value
         }
 
@@ -61,7 +62,7 @@ open class IconElement(
         // 周期任务：翻译物品帧的相关变量
         if (icon.periodUpdate > 0) {
             session.taskGroup.launchAsync(delay = 10L, period = icon.periodUpdate) {
-                if (isVisible() && paused[0]) update()
+                if (isVisible() && paused[0]) renderItem()
             }
         }
         // 周期任务：重定向子图标
@@ -95,10 +96,10 @@ open class IconElement(
     }
 
     /**
-     * 翻译当前物品帧的变量
+     * 渲染图标的物品
      */
-    fun update() {
-        frame?.translateUpdate(session, this, icon.defaultFrame)
+    fun renderItem() {
+        frame?.renderFor(agent.scale, this)
     }
 
     /**

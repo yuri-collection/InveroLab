@@ -51,7 +51,7 @@ class Frame(
     @Serializable(with = ListStringSerializer::class)
     @JsonNames("flag")
     val flags: List<String>?,
-    val unbreakable: Boolean?,
+    val unbreakable: JsonPrimitive?,
     val nbt: Map<String, JsonPrimitive>?,
     @Serializable(with = ListSlotSerializer::class)
     @JsonNames("slots", "pos", "position", "positions")
@@ -79,6 +79,9 @@ class Frame(
     internal val staticGlow = glow?.booleanOrNull
 
     @Transient
+    internal val staticUnbreakable = unbreakable?.booleanOrNull
+
+    @Transient
     internal val staticNBT =
         if (nbt == null || nbt.values.any { it.content.containsAnyPlaceholder }) null
         else {
@@ -88,7 +91,6 @@ class Frame(
         }
 
     fun buildNBT(translator: (String) -> String): ItemTag {
-        if (staticNBT != null) return staticNBT
         val tag = ItemTag()
         nbt!!.forEach { (key, value) -> tag[key] = ItemTagData.toNBT(translator(value.content).inferType()) }
         return tag

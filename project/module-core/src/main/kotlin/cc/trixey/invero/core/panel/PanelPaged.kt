@@ -53,7 +53,7 @@ class PanelPaged(
             submitAsync {
                 (currentPanel as? ElementalPanel)
                     ?.elements
-                    ?.forEach { (this as IconElement).update() }
+                    ?.forEach { (this as IconElement).renderItem() }
             }
         }
 

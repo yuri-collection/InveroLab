@@ -23,6 +23,7 @@ object NodeSerializer : JsonTransformingSerializer<NodeRunnable>(serializer()) {
             put("type", "CONST")
             put("value", element.jsonPrimitive.content)
         }
+
         is JsonObject -> element
         is JsonArray -> error("NodeRunnable can not be JsonArray")
     }

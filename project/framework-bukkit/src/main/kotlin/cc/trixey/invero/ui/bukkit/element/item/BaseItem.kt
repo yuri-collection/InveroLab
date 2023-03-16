@@ -27,7 +27,7 @@ import java.util.function.Supplier
  */
 abstract class BaseItem<T : Element>(override val panel: Panel) : Supplier<ItemStack>, Element, Clickable<T> {
 
-    abstract var value: ItemStack
+    abstract var itemStack: ItemStack
 
     abstract fun get(viewer: Viewer): ItemStack
 
@@ -42,7 +42,7 @@ abstract class BaseItem<T : Element>(override val panel: Panel) : Supplier<ItemS
     override val clickCallback = CopyOnWriteArrayList<T.(ClickType, InventoryClickEvent?) -> Unit>()
 
     override fun get(): ItemStack {
-        return value
+        return itemStack
     }
 
     open fun isVisible(): Boolean {
@@ -64,7 +64,7 @@ abstract class BaseItem<T : Element>(override val panel: Panel) : Supplier<ItemS
         postRender {
             val slot = locatingAbsoluteSlot(it, panel)
             if (slot >= 0) {
-                window.inventory[slot] = value.copyUIMarked(viewer, slot)
+                window.inventory[slot] = itemStack.copyUIMarked(viewer, slot)
             }
         }
     }

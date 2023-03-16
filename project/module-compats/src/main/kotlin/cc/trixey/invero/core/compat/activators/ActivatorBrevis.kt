@@ -11,14 +11,9 @@ import kotlinx.serialization.json.JsonElement
  * @author Arasple
  * @since 2023/2/26 14:04
  */
-@DefActivator(["brevis", "combination"])
+@DefActivator(["shiftf"])
 class ActivatorBrevis(private val source: JsonElement) : MenuActivator<ActivatorBrevis>() {
 
-    /*
-    combination:
-    - SHIFT
-    - OFFHAND
-     */
     override fun deserialize(element: JsonElement) = ActivatorBrevis(element)
 
     override fun serialize(activator: ActivatorBrevis) = activator.source

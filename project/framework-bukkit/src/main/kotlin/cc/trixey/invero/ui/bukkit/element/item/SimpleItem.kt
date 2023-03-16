@@ -20,7 +20,7 @@ import java.util.function.Supplier
  */
 open class SimpleItem(panel: Panel, value: ItemStack = ItemStack(Material.AIR)) : BaseItem<SimpleItem>(panel) {
 
-    override var value: ItemStack = value
+    override var itemStack: ItemStack = value
         set(value) {
             field = value.clone()
             safePush()
@@ -29,19 +29,19 @@ open class SimpleItem(panel: Panel, value: ItemStack = ItemStack(Material.AIR)) 
     override fun get(viewer: Viewer) = get()
 
     override fun modify(builder: ItemBuilder.() -> Unit) {
-        value = buildItem(value, builder)
+        itemStack = buildItem(itemStack, builder)
     }
 
     override fun build(material: Material, builder: ItemBuilder.() -> Unit) {
-        value = buildItem(material, builder)
+        itemStack = buildItem(material, builder)
     }
 
     override fun buildAsync(supplier: Supplier<ItemStack>) {
-        submitAsync { value = supplier.get() }
+        submitAsync { itemStack = supplier.get() }
     }
 
     override fun buildFuture(completable: CompletableFuture<ItemStack>, timeout: Long) {
-        submitAsync { value = completable.get(timeout, TimeUnit.MILLISECONDS) }
+        submitAsync { itemStack = completable.get(timeout, TimeUnit.MILLISECONDS) }
     }
 
     override fun getInstance(): SimpleItem {

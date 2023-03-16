@@ -3,6 +3,7 @@ package cc.trixey.invero.core.compat.activators
 import cc.trixey.invero.common.Invero
 import cc.trixey.invero.common.MenuActivator
 import cc.trixey.invero.core.compat.DefActivator
+import cc.trixey.invero.ui.bukkit.util.format
 import kotlinx.serialization.json.*
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -40,8 +41,12 @@ class ActivatorEntity(private val types: List<String> = emptyList()) : MenuActiv
         if (types.any { it.equals(type, true) }) {
             activate(player, buildMap {
                 put("activator_entity", entity)
+                put("activator_entity_uuid", entity.uniqueId)
                 put("activator_entity_type", type)
-                put("activator_entity_name", entity.name)
+                put("activator_entity_location_x", entity.location.x.format())
+                put("activator_entity_location_y", entity.location.y.format())
+                put("activator_entity_location_z", entity.location.z.format())
+                put("activator_entity_name", entity.customName ?: entity.name)
             })
             return true
         }

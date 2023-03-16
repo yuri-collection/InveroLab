@@ -94,6 +94,6 @@ fun ScriptFrame.parse(string: String): String {
     if (session != null) {
         return session.parse(string)
     } else {
-        return string.translateFormattedMessage(player(),deepVars())
+        return string.translateFormattedMessage(player(), deepVars())
     }
 }

@@ -28,11 +28,13 @@ fun ItemStack.hasLore(): Boolean {
     return itemMeta?.hasLore() == true
 }
 
-fun ItemStack.postShiny(shiny: Boolean) = synchronized(this) {
-    if (!shiny) return@synchronized
+fun ItemStack.postShiny(shiny: Boolean) {
+    if (!shiny) {
+        itemMeta = itemMeta?.also { it.enchants.clear() }
+        return
+    }
 
     val itemMeta = itemMeta
-
     if (itemMeta is EnchantmentStorageMeta) {
         itemMeta.addStoredEnchant(Enchantment.LURE, 1, true)
     } else {
@@ -43,18 +45,18 @@ fun ItemStack.postShiny(shiny: Boolean) = synchronized(this) {
     this.itemMeta = itemMeta
 }
 
-fun ItemStack.postName(name: String) = synchronized(this) {
+fun ItemStack.postName(name: String) {
     itemMeta = itemMeta?.also { it.setDisplayName(name) }
 }
 
-fun ItemStack.postLore(lore: List<String>) = synchronized(this) {
+fun ItemStack.postLore(lore: List<String>) {
     itemMeta = itemMeta?.also { it.lore = lore }
 }
 
-fun ItemStack.postAmount(amount: Int) = synchronized(this) {
+fun ItemStack.postAmount(amount: Int) {
     this.amount = amount
 }
 
-fun ItemStack.postModel(model: Int) = synchronized(this) {
+fun ItemStack.postModel(model: Int) {
     itemMeta = itemMeta?.also { it.setCustomModelData(model) }
 }

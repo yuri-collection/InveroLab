@@ -1,11 +1,9 @@
 package cc.trixey.invero.core.script
 
 import cc.trixey.invero.core.icon.IconElement
-import cc.trixey.invero.core.script.getRecursivePanels
-import cc.trixey.invero.core.script.iconElementBy
+import cc.trixey.invero.core.script.loader.InveroKetherParser
 import cc.trixey.invero.ui.common.panel.ElementalPanel
 import taboolib.common.platform.function.submitAsync
-import cc.trixey.invero.core.script.loader.InveroKetherParser
 import taboolib.module.kether.combinationParser
 
 /**
@@ -31,17 +29,15 @@ object ActionIcon {
      */
 
     @InveroKetherParser(["icon"])
-    fun parser() = parser(null)
-
-    fun parser(ref: ElementalPanel? = null) = combinationParser {
+    fun parser() = combinationParser {
         it.group(
             command("by", then = text()).option().defaultsTo(null),
             command("at", then = int()).option().defaultsTo(-1),
             symbol(),
         ).apply(it) { by, at, action ->
             now {
-                iconElementBy(by, at, ref).apply {
-                    if (action == "item") return@now value
+                iconElementBy(by, at, null).apply {
+                    if (action == "item") return@now itemStack
                     else handle(action)
                 }
             }
@@ -66,13 +62,8 @@ object ActionIcon {
     private fun IconElement.handle(action: String, now: Boolean = false, delay: Long = 2L) =
         submitAsync(now = now, delay = delay) {
             when (action) {
-                "relocate" -> relocate()
-                "update" -> update()
-                "refresh" -> {
-                    relocate()
-                    update()
-                }
-
+                "relocate", "refresh" -> relocate()
+                "update" -> renderItem()
                 "index", "sub_index" -> iconIndex
                 "pause_update" -> pauseUpdateTask()
                 "pause_relocate" -> pauseRelocateTask()

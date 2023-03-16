@@ -23,7 +23,6 @@ fun runJS(script: String, session: Session?, variables: Map<String, Any?> = empt
     val bindings = buildMap {
         put("session", session)
         put("player", player)
-        put("sender", player)
         putAll(variables)
     }
 
