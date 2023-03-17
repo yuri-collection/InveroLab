@@ -29,6 +29,10 @@ fun ScriptFrame.getRecursivePanels(): List<Panel> {
     return session()?.window?.getPanelsRecursively() ?: emptyList()
 }
 
+fun ScriptFrame.getRootPanels(): List<Panel> {
+    return session()?.window?.panels ?: emptyList()
+}
+
 fun <T : Panel> ScriptFrame.findPanelAt(indexs: List<Int>): T? {
     val iterator = indexs.iterator()
     var panel: Any? = session()?.window
@@ -73,7 +77,10 @@ inline fun <reified T : Panel> ScriptFrame.findNearstPanel(): T? {
 }
 
 inline fun <reified T : Panel> ScriptFrame.findNearstPanelRecursively(): T? {
-    return contextVar<Panel>("@panel") as? T ?: getRecursivePanels().filterIsInstance<T>().firstOrNull()
+    val contextPanel = contextVar<Panel>("@panel")
+    val parentPanel = contextPanel?.parent as? T
+
+    return (contextPanel as? T ?: parentPanel) ?: getRecursivePanels().filterIsInstance<T>().firstOrNull()
 }
 
 fun <T> ScriptFrame.contextVar(key: String): T? {

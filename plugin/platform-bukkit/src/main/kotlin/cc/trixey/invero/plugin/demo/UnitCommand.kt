@@ -49,6 +49,9 @@ object UnitCommand {
     @CommandBody
     val IO_storage = construct { showIOStoragePanel(this) }
 
+    @CommandBody
+    val paged_netesed_paged = construct { showPagedNetesedPaged(this) }
+
     private fun construct(block: Player.(String?) -> Unit): SimpleCommandBody {
         return subCommand {
             execute { sender, _, args ->

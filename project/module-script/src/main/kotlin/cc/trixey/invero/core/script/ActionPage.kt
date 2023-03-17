@@ -1,10 +1,10 @@
 package cc.trixey.invero.core.script
 
+import cc.trixey.invero.core.script.PageOperator.*
 import cc.trixey.invero.core.script.loader.InveroKetherParser
 import cc.trixey.invero.ui.common.panel.PagedPanel
-import taboolib.library.kether.ParsedAction
+import taboolib.common5.cint
 import taboolib.module.kether.*
-import java.util.concurrent.CompletableFuture
 
 /**
  * Invero
@@ -16,50 +16,33 @@ import java.util.concurrent.CompletableFuture
 object ActionPage {
 
     @InveroKetherParser(["page"])
-    fun parserPage() = parserPage(null)
+    internal fun parserPage() = combinationParser {
+        it.group(
+            // next, previous, set, get, max, isFirst, isLast
+            symbol(),
+            // to,by
+            command("to", "by", then = action()).option().defaultsTo(null)
+        ).apply(it) { type, value ->
+            now {
+                val panel = findNearstPanelRecursively<PagedPanel>() ?: return@now "<NOT_FOUND_PAGEDPANEL>"
+                when (val operator = PageOperator.of(type)) {
+                    GET -> panel.pageIndex
+                    GET_MAX -> panel.maxPageIndex
+                    IS_FIRST_PAGE -> panel.pageIndex == 0
+                    IS_LAST_PAGE -> panel.pageIndex == panel.maxPageIndex
+                    else -> {
+                        val target = value?.let { v -> run(v).getNow(0) }?.cint?.coerceAtLeast(0) ?: 1
 
-    internal fun parserPage(ref: PagedPanel?) = combinationParser {
-        it.group(symbol()).apply(it) { type ->
-            val operator = PageOperator.of(type)
-            var value: ParsedAction<*>? = null
-            if (operator == PageOperator.MODIFY) {
-                it.group(action()).apply(it) { info -> value = info }
-            } else if (!operator.isOutput()) {
-                it.group(command("by", "to", then = action()).option().defaultsTo(null)).apply(it) { info ->
-                    value = info
+                        when (operator) {
+                            SET -> panel.pageIndex = target
+                            NEXT -> panel.nextPage(target)
+                            PREVIOUS -> panel.previousPage(target)
+                            else -> error("Unreachable")
+                        }
+                    }
                 }
             }
-            future { runPage(this, operator, value, ref) }
         }
-    }
-
-    private fun runPage(
-        frame: ScriptFrame,
-        operator: PageOperator,
-        value: ParsedAction<*>?,
-        ref: PagedPanel?
-    ): CompletableFuture<Any?> {
-        val panel = ref ?: frame.findNearstPanelRecursively() ?: return CompletableFuture.completedFuture(-1)
-
-        // 输出 Page 值
-        if (operator.isOutput()) {
-            return when (operator) {
-                PageOperator.GET -> panel.pageIndex
-                PageOperator.GET_MAX -> panel.maxPageIndex
-                PageOperator.IS_FIRST_PAGE -> panel.pageIndex == 0
-                PageOperator.IS_LAST_PAGE -> panel.pageIndex == panel.maxPageIndex
-                else -> error("unreachable")
-            }.let { CompletableFuture.completedFuture(it) }
-        }
-
-        // 修改 Page
-        if (value != null) {
-            frame.run(value).int { operator.invoke(panel, it) }
-        } else {
-            operator.invoke(panel, 1)
-        }
-
-        return CompletableFuture.completedFuture(panel.pageIndex)
     }
 
 }

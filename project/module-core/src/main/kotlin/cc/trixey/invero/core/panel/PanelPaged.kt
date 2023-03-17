@@ -51,9 +51,11 @@ class PanelPaged(
 
             // 临时补丁：页码变量初始化
             submitAsync {
-                (currentPanel as? ElementalPanel)
-                    ?.elements
-                    ?.forEach { (this as IconElement).renderItem() }
+                if (parent.isPanelValid(this@pagedNetesed)) {
+                    (currentPanel as? ElementalPanel)
+                        ?.elements
+                        ?.forEach { (this as IconElement).renderItem() }
+                }
             }
         }
 

@@ -2,7 +2,9 @@ package cc.trixey.invero.core.script
 
 import cc.trixey.invero.core.icon.IconElement
 import cc.trixey.invero.core.script.loader.InveroKetherParser
+import cc.trixey.invero.ui.common.Panel
 import cc.trixey.invero.ui.common.panel.ElementalPanel
+import cc.trixey.invero.ui.common.panel.TypedPanelContainer
 import taboolib.common.platform.function.submitAsync
 import taboolib.module.kether.combinationParser
 
@@ -46,18 +48,25 @@ object ActionIcon {
 
     @InveroKetherParser(["icons"])
     fun parserIcons() = combinationParser { it ->
-        it.group(symbol()).apply(it) { action ->
-            now {
-                getRecursivePanels()
-                    .filterIsInstance<ElementalPanel>()
-                    .flatMap { it.elements.value.keys }
-                    .forEach {
+
+        fun updatePanel(panel: Panel, action: String) {
+            when (panel) {
+                is TypedPanelContainer<*> -> {
+                    panel.panels.filter { panel.isPanelValid(it) }.forEach { updatePanel(it, action) }
+                }
+
+                is ElementalPanel -> {
+                    panel.elements.value.keys.forEach {
                         if (it is IconElement) it.handle(action, true, 0L)
                     }
+                }
             }
         }
-    }
 
+        it.group(symbol()).apply(it) { action ->
+            now { getRootPanels().forEach { updatePanel(it, action) } }
+        }
+    }
 
     private fun IconElement.handle(action: String, now: Boolean = false, delay: Long = 2L) =
         submitAsync(now = now, delay = delay) {
