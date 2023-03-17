@@ -8,69 +8,104 @@ import cc.trixey.invero.ui.common.Scale
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.inventory.meta.ItemMeta
 import taboolib.common5.cbool
 import taboolib.common5.cint
 import taboolib.common5.cshort
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.getItemTag
+import taboolib.platform.util.isAir
 import taboolib.platform.util.modifyMeta
 
 /**
  * Invero
- * cc.trixey.invero.core.item.ItemstackGenerate
+ * cc.trixey.invero.core.item.ItemGenerator
  *
  * @author Arasple
  * @since 2023/3/16 23:07
  */
+fun Frame.renderFor(containerScale: Scale, iconElement: IconElement, defaultFrame: Frame, setSlot: Boolean = true) {
+    val context = iconElement.context
+    val previous = iconElement.itemStack
+    if (texture == null) {
+        iconElement.itemStack = previous.generateProperties(this, context, defaultFrame)
+    } else {
+        texture.generateItem(context) {
+            iconElement.itemStack = generateProperties(this@renderFor, context, defaultFrame)
+        }
+    }
+    if (setSlot && slot != null) {
+        iconElement.set(slot.flatRelease(containerScale))
+    }
+}
+
 private fun ItemStack.generateProperties(
     frame: Frame,
     context: Context,
+    defaultFrame: Frame
 ): ItemStack {
+    if (isAir) return this
+    val isDefaultFrame = frame == defaultFrame
+
+    fun <T> frameBy(block: Frame.() -> T?): T? {
+        return if (!isDefaultFrame) frame.block() ?: defaultFrame.block()
+        else frame.block()
+    }
+
+
     return modifyMeta<ItemMeta> {
         // 显示名称
-        frame.name?.let {
+        frameBy { name }?.let {
             setDisplayName(context.parse(it).prefixColored)
         }
         // 显示描述
-        frame.lore?.let {
+        frameBy { lore }?.let {
             lore = context.parse(it).loreColored(frame.enhancedLore)
         }
         // [属性] 数量
-        frame.amount?.let {
+        frameBy { amount }?.let {
             amount = (frame.staticAmount ?: context.parse(it.content).cint).coerceAtLeast(0)
         }
         // [属性] 损伤值
-        frame.damage?.let {
+        frameBy { damage }?.let {
             @Suppress("DEPRECATION")
             durability = frame.staticDamage ?: context.parse(it.content).cshort
         }
         // [属性] 模型数据
-        frame.customModelData?.let {
+        frameBy { customModelData }?.let {
             setCustomModelData(frame.staticCustomModelData ?: context.parse(it.content).cint)
         }
         // [属性] 是否发光
-        frame.glow?.let {
+        frameBy { glow }?.let {
             if (frame.staticGlow == true || context.parse(it.content).cbool) {
                 addItemFlags(ItemFlag.HIDE_ENCHANTS)
-                addUnsafeEnchantment(Enchantment.DURABILITY, 1)
-            } else {
-                removeEnchantment(Enchantment.DURABILITY)
+                if (this is EnchantmentStorageMeta) addStoredEnchant(Enchantment.LURE, 1, true)
+                else addEnchant(Enchantment.LURE, 1, true)
+            } else try {
+                removeEnchantment(Enchantment.LURE)
+                removeEnchant(Enchantment.LURE)
+            } catch (e: Throwable) {
+                e.printStackTrace()
             }
         }
         // [属性] 不可破坏
-        frame.unbreakable?.let {
+        frameBy { unbreakable }?.let {
             if (frame.staticUnbreakable == true || context.parse(it.content).cbool) {
                 isUnbreakable = true
             }
         }
         // [属性] 物品标签
-        frame.flags?.forEach {
+        frameBy { flags }?.forEach {
             addItemFlags(ItemFlag.valueOf(it.replace(' ', '_').uppercase()))
+        }
+        // [属性] 附魔
+        frameBy { enchantments }?.forEach { (enchantment, level) ->
+            // TODO
         }
     }.also { itemStack ->
         // [属性] NBT
-        frame.nbt?.let {
+        frameBy { nbt }?.let {
             ItemTag().apply {
                 putAll(getItemTag())
                 if (frame.staticNBT != null) putAll(frame.staticNBT)
@@ -78,22 +113,6 @@ private fun ItemStack.generateProperties(
                 saveTo(itemStack)
             }
         }
-    }
-}
-
-fun Frame.renderFor(containerScale: Scale, iconElement: IconElement, setSlot: Boolean = true) {
-    val context = iconElement.context
-    val previous = iconElement.itemStack
-
-    if (texture == null) {
-        iconElement.itemStack = previous.generateProperties(this, context)
-    } else {
-        texture.generateItem(context) {
-            iconElement.itemStack = generateProperties(this@renderFor, context)
-        }
-    }
-    if (setSlot && slot != null) {
-        iconElement.set(slot.flatRelease(containerScale))
     }
 }
 

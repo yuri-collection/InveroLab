@@ -38,16 +38,16 @@ internal object SelectorAction : JsonContentPolymorphicSerializer<Action>(Action
     val structuredKeys = serializers.values.flatten()
 
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<Action> {
-        return if (element is JsonPrimitive) {
-            ActionKether.serializer()
-        } else if (element is JsonArray) {
-             NetesedAction.serializer()
-        } else {
-            val keys = element.jsonObject.keys
-            serializers
-                .entries
-                .find { it.value.any { it in keys } }
-                ?.key ?: error("Unregonized action [$keys]")
+        return when (element) {
+            is JsonPrimitive -> ActionKether.serializer()
+            is JsonArray -> NetesedAction.serializer()
+            else -> {
+                val keys = element.jsonObject.keys
+                serializers
+                    .entries
+                    .find { it.value.any { s -> s in keys } }
+                    ?.key ?: error("Unregonized action [$keys]")
+            }
         }
     }
 

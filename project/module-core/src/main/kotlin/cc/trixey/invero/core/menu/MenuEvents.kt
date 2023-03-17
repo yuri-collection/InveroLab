@@ -5,11 +5,11 @@ package cc.trixey.invero.core.menu
 import cc.trixey.invero.core.Context
 import cc.trixey.invero.core.Session
 import cc.trixey.invero.core.action.Action
-import cc.trixey.invero.ui.bukkit.PlayerViewer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 import taboolib.common.platform.function.submitAsync
+import java.util.concurrent.CompletableFuture
 
 /**
  * Invero
@@ -31,15 +31,15 @@ class MenuEvents(
     /**
      * Instant
      */
-    fun preOpen(viewer: PlayerViewer): Boolean? {
-        return preOpen?.run(Context(viewer))?.getNow(false)
+    fun preOpen(session: Session): CompletableFuture<Boolean> {
+        return preOpen?.run(Context(session.viewer, session)) ?: CompletableFuture.completedFuture(true)
     }
 
     /**
      * Async
      */
-    fun postOpen(session: Session) = submitAsync {
-        postOpen?.run(Context(session.viewer, session))?.get()
+    fun postOpen(session: Session) {
+        postOpen?.run(Context(session.viewer, session))
     }
 
     /**
@@ -47,7 +47,7 @@ class MenuEvents(
      */
     fun close(session: Session) = submitAsync {
         if (session.viewer.isAvailable()) {
-            close?.run(Context(session.viewer, session))?.get()
+            close?.run(Context(session.viewer, session))
         }
     }
 

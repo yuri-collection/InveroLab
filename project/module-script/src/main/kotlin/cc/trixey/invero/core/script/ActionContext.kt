@@ -48,7 +48,7 @@ object ActionContext {
                     "inc", "increase", "+=" -> {
                         (value ?: error("No valid value")).thenApply {
                             session()?.apply {
-                                val result = getVariable(key).cdouble + it.cdouble
+                                val result = (getVariable(key).cdouble + it.cdouble).round()
                                 variables().set(key, result)
                                 setVariable(key, result)
                             }
@@ -58,7 +58,7 @@ object ActionContext {
                     "dec", "decrease", "-=" -> {
                         (value ?: error("No valid value")).thenApply {
                             session()?.apply {
-                                val result = getVariable(key).cdouble - it.cdouble
+                                val result = (getVariable(key).cdouble - it.cdouble).round()
                                 variables().set(key, result)
                                 setVariable(key, result)
                             }
@@ -69,6 +69,10 @@ object ActionContext {
                 }
             }
         }
+    }
+
+    private fun Double.round(): Any {
+        return if (this - toInt() > 0) this else toInt()
     }
 
 }

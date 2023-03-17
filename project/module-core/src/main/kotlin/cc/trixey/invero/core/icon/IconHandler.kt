@@ -17,15 +17,15 @@ import kotlinx.serialization.json.JsonNames
  */
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
-class IconHandler(@JsonNames("def") val default: Action?, val typed: Map<ClickType, Action> = mapOf()) {
+class IconHandler(@JsonNames("def") val default: Action?, private val typed: Map<ClickType, Action> = mapOf()) {
 
     fun run(context: Context, clickType: ClickType) {
         // 临时暂停动态标题
         context.session?.pauseAnimatedTitle(5L)
         alert {
-            typed[clickType]?.run(context)?.get()
-            if (clickType.isNumberKeyClick) typed[ClickType.NUMBER_KEY]?.run(context)?.get()
-            default?.run(context)?.get()
+            typed[clickType]?.run(context)
+            if (clickType.isNumberKeyClick) typed[ClickType.NUMBER_KEY]?.run(context)
+            default?.run(context)
         }
     }
 

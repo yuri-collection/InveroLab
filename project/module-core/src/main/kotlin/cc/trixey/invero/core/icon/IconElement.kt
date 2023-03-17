@@ -35,7 +35,7 @@ open class IconElement(
 
     private var frame: Frame? = null
         set(value) {
-            value?.renderFor(agent.scale, this)
+            value?.renderFor(agent.scale, this, currentIcon.defaultFrame)
             field = value
         }
 
@@ -99,7 +99,7 @@ open class IconElement(
      * 渲染图标的物品
      */
     fun renderItem() {
-        frame?.renderFor(agent.scale, this)
+        frame?.renderFor(agent.scale, this, currentIcon.defaultFrame)
     }
 
     /**

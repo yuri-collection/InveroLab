@@ -179,18 +179,14 @@ internal object ActionKetherSerializer : KSerializer<ActionKether> {
     override fun deserialize(decoder: Decoder): ActionKether {
         val element = (decoder as JsonDecoder).decodeJsonElement()
         return when (element) {
-            is JsonArray -> element.mapNotNull { it.jsonPrimitive.contentOrNull }
-            is JsonPrimitive -> listOf(element.content)
+            is JsonArray -> element.mapNotNull { it.jsonPrimitive.contentOrNull }.joinToString("\n") { it }
+            is JsonPrimitive -> element.content
             is JsonObject -> error("ActionKetherSerializer does not support JsonObject")
         }.let { ActionKether(it) }
     }
 
     override fun serialize(encoder: Encoder, value: ActionKether) {
-        val scripts = value.scripts
-        scripts.singleOrNull()?.let { encoder.encodeString(it) }
-        if (scripts.size > 1) {
-            encoder.encodeSerializableValue(listStringSerializer, scripts)
-        }
+        encoder.encodeString(value.script)
     }
 
 }
