@@ -2,14 +2,14 @@ title: 'empty title'
 
 title_:
   period: 20
-  type: reversable
+  type: reversible
   values:
     - '1'
     - '2'
 
 title_3:
   period: 20
-  type: reversable
+  type: reversible
 
   frames:
     - value: '11'

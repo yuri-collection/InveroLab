@@ -35,7 +35,7 @@ class Cyclic<T>(internal val value: Array<T>, override var mode: CycleMode = Cyc
         } else if (mode.isLoop) {
             if (index == maxIndex) index = 0
             else index++
-        } else if (mode.isReversable) {
+        } else if (mode.isReversible) {
             if (reversing) {
                 index--
                 if (index == 0) reversing = false

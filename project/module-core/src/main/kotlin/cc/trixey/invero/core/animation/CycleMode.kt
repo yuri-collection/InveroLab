@@ -2,6 +2,7 @@ package cc.trixey.invero.core.animation
 
 import cc.trixey.invero.core.serialize.CycleModeSerializer
 import kotlinx.serialization.Serializable
+import taboolib.common.util.Strings
 
 /**
  * TrMenu
@@ -17,7 +18,7 @@ enum class CycleMode {
 
     LOOP,
 
-    REVERSABLE,
+    REVERSIBLE,
 
     RANDOM;
 
@@ -27,8 +28,8 @@ enum class CycleMode {
     val isLoop: Boolean
         get() = this == LOOP
 
-    val isReversable: Boolean
-        get() = this == REVERSABLE
+    val isReversible: Boolean
+        get() = this == REVERSIBLE
 
     val isRandom: Boolean
         get() = this == RANDOM
@@ -36,7 +37,7 @@ enum class CycleMode {
     companion object {
 
         fun of(name: String): CycleMode {
-            return values().find { it.name.equals(name, true) } ?: LOOP
+            return values().maxBy { Strings.similarDegree(name.uppercase(), it.name) }
         }
 
     }
