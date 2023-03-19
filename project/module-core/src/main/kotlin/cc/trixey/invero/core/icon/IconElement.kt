@@ -99,7 +99,7 @@ open class IconElement(
      * 渲染图标的物品
      */
     fun renderItem() {
-        frame?.renderFor(agent.scale, this, currentIcon.defaultFrame)
+        frame?.renderFor(agent.scale, this, currentIcon.defaultFrame, setSlot = false)
     }
 
     /**

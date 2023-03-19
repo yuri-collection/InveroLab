@@ -205,18 +205,30 @@ internal object ScriptKetherSerializer : KSerializer<ScriptKether> {
 
 internal object MenuTitleSerializer : JsonTransformingSerializer<MenuTitle>(MenuTitle.serializer()) {
 
-    override fun transformDeserialize(element: JsonElement) =
-        if (element !is JsonObject) {
-            buildJsonObject { put("value", buildJsonArray { add(element) }) }
-        } else element
+    override fun transformDeserialize(element: JsonElement): JsonObject {
+        return when (element) {
+            is JsonPrimitive -> buildJsonObject {
+                put(
+                    "frames",
+                    buildJsonArray { add(buildJsonObject { put("value", element.content) }) }
+                )
+            }
 
+            is JsonObject ->
+                if ("values" in element.keys) {
+                    buildJsonObject {
+                        element.forEach { (key, value) -> put(key, value) }
+                        element["values"]!!
+                            .jsonArray
+                            .map { buildJsonObject { put("value", it.jsonPrimitive.content) } }
+                            .let { put("frames", JsonArray(it)) }
+                    }
+                } else {
+                    element
+                }
 
-    override fun transformSerialize(element: JsonElement) = element.let {
-        val titles = it.jsonObject["value"]?.let { value ->
-            if (value is JsonPrimitive) buildJsonArray { add(value) }
-            else value as JsonArray
+            else -> error("MenuTitleSerializer does not support $element")
         }
-        if (titles?.size == 1) titles.first() else it
     }
 
 }

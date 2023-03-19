@@ -54,7 +54,6 @@ abstract class BaseItem<T : Element>(override val panel: Panel) : Supplier<ItemS
 
         val elements = (panel as ElementalPanel).elements
         val positions = elements.locateElement(this)?.values ?: setOf()
-
         positions.forEach(block)
     }
 

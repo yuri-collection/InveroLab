@@ -24,8 +24,8 @@ fun ItemStack.isUIMarked(): Boolean {
 
 fun ItemStack.copyUIMarked(viewer: String, slot: Int): ItemStack {
     if (isAir) return this
-    val modified = clone()
     val mark = "$viewer:$slot"
+    val modified = clone()
 
     return if (MinecraftVersion.majorLegacy > 11400) {
         modified.modifyMeta<ItemMeta> {

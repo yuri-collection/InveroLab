@@ -13,7 +13,9 @@ import cc.trixey.invero.core.menu.*
 import cc.trixey.invero.core.panel.PanelCrafting
 import cc.trixey.invero.core.serialize.ListAgentPanelSerializer
 import cc.trixey.invero.core.serialize.NodeSerializer
+import cc.trixey.invero.core.util.containsAnyPlaceholder
 import cc.trixey.invero.core.util.session
+import cc.trixey.invero.core.util.translateFormattedMessage
 import cc.trixey.invero.core.util.unregisterSession
 import cc.trixey.invero.ui.bukkit.InventoryPacket
 import cc.trixey.invero.ui.bukkit.InventoryVanilla
@@ -97,7 +99,8 @@ class BaseMenu(
             virtual = isVirtual(),
             type = settings.containerType,
             hidePlayerInventory = settings.hidePlayerInventory,
-            overridePlayerInventory = settings.overridePlayerInventory
+            overridePlayerInventory = settings.overridePlayerInventory,
+            title = settings.title.default.translateFormattedMessage(viewer.get(), vars),
         ).onClose {
             // restore collection
             val player = viewer.get<Player>()
@@ -126,7 +129,10 @@ class BaseMenu(
                 // 开启 Window
                 // 其本身会检查是否已经打开任何 Window，并自动关闭等效旧菜单的 Window
                 window.preOpen { panels.forEach { it.invoke(window, session) } }
-                window.onOpen { updateTitle(session) }
+                // 部分标题需要菜单语境变量更新的情况
+                if (settings.title.default.containsAnyPlaceholder) {
+                    window.onOpen { updateTitle(session) }
+                }
                 window.open()
                 // 屏蔽掉频繁的交互
                 if (isVirtual())

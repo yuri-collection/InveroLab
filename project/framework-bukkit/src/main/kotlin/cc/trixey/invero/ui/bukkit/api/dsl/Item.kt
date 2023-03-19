@@ -72,7 +72,7 @@ fun <T : Element> T.locate(): Set<Pos>? {
     return elements.locateElement(this)?.values
 }
 
-fun <T : Element> T.set(pos: Collection<Pos>): T {
+fun <T : Element> T.set(pos: Collection<Pos>, push: Boolean = false): T {
     val panel = panel as ElementalPanel
     val elements = panel.elements
 
@@ -80,8 +80,7 @@ fun <T : Element> T.set(pos: Collection<Pos>): T {
     elements.setElement(this, Positions(pos))?.let { panel.wipe(it) }
 
     // Auto-push
-    safePush()
-
+    if (push) safePush()
     return this
 }
 

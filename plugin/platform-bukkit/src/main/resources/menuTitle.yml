@@ -1,0 +1,16 @@
+title: 'empty title'
+
+title_:
+  period: 20
+  type: reversable
+  values:
+    - '1'
+    - '2'
+
+title_3:
+  period: 20
+  type: reversable
+
+  frames:
+    - value: '11'
+      last: 20

@@ -28,15 +28,17 @@ import taboolib.platform.util.modifyMeta
 fun Frame.renderFor(containerScale: Scale, iconElement: IconElement, defaultFrame: Frame, setSlot: Boolean = true) {
     val context = iconElement.context
     val previous = iconElement.itemStack
+
+    if (setSlot && slot != null) {
+        iconElement.set(slot.flatRelease(containerScale))
+    }
+
     if (texture == null) {
         iconElement.itemStack = previous.generateProperties(this, context, defaultFrame)
     } else {
         texture.generateItem(context) {
             iconElement.itemStack = generateProperties(this@renderFor, context, defaultFrame)
         }
-    }
-    if (setSlot && slot != null) {
-        iconElement.set(slot.flatRelease(containerScale))
     }
 }
 
@@ -52,7 +54,6 @@ private fun ItemStack.generateProperties(
         return if (!isDefaultFrame) frame.block() ?: defaultFrame.block()
         else frame.block()
     }
-
 
     return modifyMeta<ItemMeta> {
         // 显示名称

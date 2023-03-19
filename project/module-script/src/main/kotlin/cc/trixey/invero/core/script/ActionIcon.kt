@@ -5,7 +5,6 @@ import cc.trixey.invero.core.script.loader.InveroKetherParser
 import cc.trixey.invero.ui.common.Panel
 import cc.trixey.invero.ui.common.panel.ElementalPanel
 import cc.trixey.invero.ui.common.panel.TypedPanelContainer
-import taboolib.common.platform.function.submitAsync
 import taboolib.module.kether.combinationParser
 
 /**
@@ -57,7 +56,7 @@ object ActionIcon {
 
                 is ElementalPanel -> {
                     panel.elements.value.keys.forEach {
-                        if (it is IconElement) it.handle(action, true, 0L)
+                        if (it is IconElement) it.handle(action)
                     }
                 }
             }
@@ -68,20 +67,19 @@ object ActionIcon {
         }
     }
 
-    private fun IconElement.handle(action: String, now: Boolean = false, delay: Long = 2L) =
-        submitAsync(now = now, delay = delay) {
-            when (action) {
-                "relocate", "refresh" -> relocate()
-                "update" -> renderItem()
-                "index", "sub_index" -> iconIndex
-                "pause_update" -> pauseUpdateTask()
-                "pause_relocate" -> pauseRelocateTask()
-                "pause_frames" -> pauseFramesTask()
-                "resume_update" -> resumeUpdateTask()
-                "resume_relocate" -> resumeRelocateTask()
-                "resume_frames" -> resumeFramesTask()
-                else -> error("Unsupported action for icon: $action")
-            }
+    private fun IconElement.handle(action: String) {
+        when (action) {
+            "relocate", "refresh" -> relocate()
+            "update" -> renderItem()
+            "index", "sub_index" -> iconIndex
+            "pause_update" -> pauseUpdateTask()
+            "pause_relocate" -> pauseRelocateTask()
+            "pause_frames" -> pauseFramesTask()
+            "resume_update" -> resumeUpdateTask()
+            "resume_relocate" -> resumeRelocateTask()
+            "resume_frames" -> resumeFramesTask()
+            else -> error("Unsupported action for icon: $action")
         }
+    }
 
 }

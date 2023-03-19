@@ -5,8 +5,7 @@ package cc.trixey.invero.core.menu
 import cc.trixey.invero.core.Session
 import cc.trixey.invero.core.animation.CycleMode
 import cc.trixey.invero.core.animation.toCyclic
-import cc.trixey.invero.core.serialize.ListStringSerializer
-import cc.trixey.invero.core.util.containsAnyPlaceholder
+import cc.trixey.invero.core.util.session
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -21,32 +20,45 @@ import kotlinx.serialization.json.JsonNames
  */
 @Serializable
 class MenuTitle(
-    @Serializable(with = ListStringSerializer::class)
-    @JsonNames("values")
-    val value: List<String>,
+    @JsonNames("mode")
+    val type: CycleMode?,
     val period: Long?,
-    @JsonNames("type")
-    val mode: CycleMode?
+    val frames: List<Frame>
 ) {
 
-    @Transient
-    val isStatic = value.size <= 1 || ((period == null || period < 0) && mode == null)
+    @Serializable
+    class Frame(
+        @JsonNames("title")
+        val value: String,
+        @JsonNames("delay")
+        val last: Long?
+    )
 
     @Transient
-    val default = value.getOrElse(0) { "Untitled" }
+    val isStatic = frames.size <= 1
+
+    @Transient
+    val default = frames.getOrElse(0) { Frame("Untitled", null) }.value
 
     fun submit(session: Session) {
-        if (isStatic && value.none { it.containsAnyPlaceholder } && period == null) {
-            return
-        }
-        val cyclic = value.toCyclic(mode ?: CycleMode.LOOP)
-        if (period != null) {
-            session.taskGroup.launchAsync(delay = period, period = period) {
+        if (isStatic) return
+        val cyclic = frames.toCyclic(type ?: CycleMode.LOOP)
+
+        fun loop(delay: Long) {
+            session.taskGroup.launchAsync(delay = delay) {
+                if (session != session.viewer.session) return@launchAsync
                 if (session.getVariable("title_task_running") != false) {
-                    session.window.title = cyclic.getAndCycle().let { session.parse(it) }
+                    val frame = cyclic.getAndCycle()
+                    session.window.title = frame.let { session.parse(it.value) }
+
+                    loop(frame.last ?: period ?: 20)
+                } else {
+                    loop(20)
                 }
             }
         }
+
+        loop(10)
     }
 
 }

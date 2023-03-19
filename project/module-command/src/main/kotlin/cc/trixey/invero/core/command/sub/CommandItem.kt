@@ -1,12 +1,9 @@
 package cc.trixey.invero.core.command.sub
 
+import cc.trixey.invero.common.util.*
 import cc.trixey.invero.common.util.PasteResult.Status.ERROR
 import cc.trixey.invero.common.util.PasteResult.Status.SUCCESS
-import cc.trixey.invero.common.util.createContent
-import cc.trixey.invero.common.util.paste
 import cc.trixey.invero.core.serialize.ItemStackJsonSerializer
-import cc.trixey.invero.common.util.prettyJson
-import cc.trixey.invero.common.util.standardJson
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
@@ -63,7 +60,7 @@ object CommandItem {
         submitAsync {
             player.sendLang("paste-init")
 
-            val serialized = Json.encodeToJsonElement(ItemStackJsonSerializer, this@postItemSerialization).jsonObject
+            val serialized = Json.encodeToJsonElement(ItemStackJsonSerializer, this@postItemSerialization).jsonObject.reduceEmpty()
             val view = createContent("Structure View", prettyJson.encodeToString(serialized), "JSON")
             val base64 = createContent("Format Base64", Base64.getEncoder().encodeToString(serializeToByteArray()))
             val json = createContent("Format Json", standardJson.encodeToString(serialized), "JSON")
