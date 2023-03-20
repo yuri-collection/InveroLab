@@ -1,6 +1,7 @@
 package cc.trixey.invero.ui.bukkit
 
 import cc.trixey.invero.ui.bukkit.api.isRegistered
+import cc.trixey.invero.ui.bukkit.nms.handler
 import cc.trixey.invero.ui.bukkit.panel.CraftingPanel
 import cc.trixey.invero.ui.bukkit.util.clickType
 import cc.trixey.invero.ui.bukkit.util.synced
@@ -27,6 +28,7 @@ class InventoryVanilla(override val window: BukkitWindow) : ProxyBukkitInventory
         error("Not supported inventory type (${containerType.bukkitType}) yet")
     }
 
+    override var containerId: Int = -1
     override val hidePlayerInventory: Boolean
         get() = window.hidePlayerInventory
 
@@ -87,6 +89,7 @@ class InventoryVanilla(override val window: BukkitWindow) : ProxyBukkitInventory
 
     override fun open() {
         viewer.openInventory(container)
+        containerId = handler.getContainerId(viewer)
     }
 
     fun handleClick(e: InventoryClickEvent) {

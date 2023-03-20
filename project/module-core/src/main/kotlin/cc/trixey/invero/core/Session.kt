@@ -39,8 +39,12 @@ class Session(
         updateVariables()
     }
 
-    fun hasVariable(key: String): Boolean {
+    fun hasValidVariable(key: String): Boolean {
         return !variables.getOrDefault(key, null)?.toString().isNullOrBlank()
+    }
+
+    fun hasVariable(key: String): Boolean {
+        return variables.containsKey(key)
     }
 
     fun updateVariables() {

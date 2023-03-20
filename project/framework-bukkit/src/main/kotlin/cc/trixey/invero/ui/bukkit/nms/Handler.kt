@@ -2,6 +2,7 @@ package cc.trixey.invero.ui.bukkit.nms
 
 import cc.trixey.invero.ui.bukkit.BukkitWindow
 import cc.trixey.invero.ui.bukkit.InventoryPacket
+import cc.trixey.invero.ui.bukkit.InventoryVanilla
 import cc.trixey.invero.ui.bukkit.PlayerViewer
 import cc.trixey.invero.ui.bukkit.api.notViewingWindow
 import io.netty.util.internal.ConcurrentSet
@@ -46,13 +47,16 @@ fun PlayerViewer.isTitleUpdating(): Boolean {
 fun BukkitWindow.updateTitle(title: String, updateInventory: Boolean = true) {
     if (viewer.isTitleUpdating()) return
     else viewer.setTitleUpdating()
+
     val player = viewer.get<Player>()
-    val virtual = inventory is InventoryPacket
-    val id = if (virtual) persistContainerId else handler.getContainerId(player)
+    val id = inventory.containerId
 
     handler.sendWindowOpen(player, id, type, title)
-    if (virtual) (inventory as InventoryPacket).update()
-    else if (updateInventory) player.updateInventory()
+    if (updateInventory && inventory is InventoryVanilla) {
+        player.updateInventory()
+    } else {
+        (inventory as InventoryPacket).update()
+    }
 
     // 补刀
     submitAsync(delay = 2L) {

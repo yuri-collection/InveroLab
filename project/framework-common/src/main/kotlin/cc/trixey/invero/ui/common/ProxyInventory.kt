@@ -11,6 +11,8 @@ interface ProxyInventory {
 
     val window: Window
 
+    var containerId: Int
+
     val containerType: ContainerType
         get() = window.type
 
@@ -23,7 +25,7 @@ interface ProxyInventory {
     fun isViewing(): Boolean
 
     fun open()
-    
+
     fun clear(slots: Collection<Int>)
 
 }

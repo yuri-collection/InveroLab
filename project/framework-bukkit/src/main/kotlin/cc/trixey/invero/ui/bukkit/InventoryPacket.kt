@@ -17,6 +17,8 @@ class InventoryPacket(override val window: BukkitWindow) : ProxyBukkitInventory 
     override val hidePlayerInventory: Boolean
         get() = window.hidePlayerInventory
 
+    override var containerId: Int = persistContainerId
+
     override fun isVirtual(): Boolean {
         return true
     }

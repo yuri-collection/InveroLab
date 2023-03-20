@@ -7,6 +7,7 @@ import cc.trixey.invero.core.animation.CycleMode
 import cc.trixey.invero.core.animation.toCyclic
 import cc.trixey.invero.core.util.session
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JsonNames
@@ -23,7 +24,9 @@ class MenuTitle(
     @JsonNames("mode")
     val type: CycleMode?,
     val period: Long?,
-    val frames: List<Frame>
+    val frames: List<Frame>,
+    @SerialName("pre-generate")
+    val preGenerate: Boolean?
 ) {
 
     @Serializable
@@ -42,23 +45,28 @@ class MenuTitle(
 
     fun submit(session: Session) {
         if (isStatic) return
-        val cyclic = frames.toCyclic(type ?: CycleMode.LOOP)
+        val cyclic = frames
+            .map {
+                if (preGenerate != false) Frame(session.parse(it.value), it.last ?: period ?: 20L)
+                else it
+            }
+            .toCyclic(type ?: CycleMode.LOOP)
 
         fun loop(delay: Long) {
             session.taskGroup.launchAsync(delay = delay) {
                 if (session != session.viewer.session) return@launchAsync
-                if (session.getVariable("title_task_running") != false) {
-                    val frame = cyclic.getAndCycle()
-                    session.window.title = frame.let { session.parse(it.value) }
-
-                    loop(frame.last ?: period ?: 20)
-                } else {
+                if (session.hasVariable("title_task_running")) {
                     loop(20)
+                    return@launchAsync
+                }
+                cyclic.getAndCycle().apply {
+                    session.window.title = if (preGenerate != false) value else session.parse(value)
+                    loop(last ?: period ?: 20)
                 }
             }
         }
 
-        loop(10)
+        loop(0)
     }
 
 }

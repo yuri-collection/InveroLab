@@ -1,5 +1,6 @@
 package cc.trixey.invero.ui.bukkit.nms
 
+import cc.trixey.invero.ui.common.ContainerType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -22,7 +23,7 @@ interface NMS {
      * @param type The window type to use for display. See WindowProperty for the different values.
      * @param title The title of the window
      */
-    fun sendWindowOpen(player: Player, containerId: Int, type: cc.trixey.invero.ui.common.ContainerType, title: String)
+    fun sendWindowOpen(player: Player, containerId: Int, type: ContainerType, title: String)
 
     /**
      * This packet is sent by the client when closing a window.

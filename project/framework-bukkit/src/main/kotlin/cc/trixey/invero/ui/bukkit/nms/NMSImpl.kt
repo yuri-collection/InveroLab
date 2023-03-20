@@ -24,7 +24,12 @@ class NMSImpl : NMS {
 
     private val itemAir = null.asNMSCopy()
 
-    override fun sendWindowOpen(player: Player, containerId: Int, type: cc.trixey.invero.ui.common.ContainerType, title: String) {
+    override fun sendWindowOpen(
+        player: Player,
+        containerId: Int,
+        type: cc.trixey.invero.ui.common.ContainerType,
+        title: String
+    ) {
         val instance = PacketPlayOutOpenWindow::class.java.unsafeInstance()
 
         when {
@@ -122,8 +127,7 @@ class NMSImpl : NMS {
 
     override fun getContainerId(player: Player): Int {
         player as CraftPlayer
-
-        return if (isUniversal) {
+        return  if (isUniversal) {
             player.handle.getProperty<Container>("containerMenu")!!.getProperty<Int>("containerId")!!
         } else {
             player.handle.activeContainer.windowId
